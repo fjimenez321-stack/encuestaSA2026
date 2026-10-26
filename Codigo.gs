@@ -51,6 +51,14 @@ function guardarRespuesta(datos) {
       hoja.setFrozenRows(1);
     }
 
+    // Si este envío ya está guardado (doble clic, reintento), no se duplica.
+    const colId = encabezados.indexOf('id_envio');
+    if (colId >= 0 && datos.id_envio && hoja.getLastRow() > 1) {
+      const desde = Math.max(2, hoja.getLastRow() - 199); // revisa las últimas 200 filas
+      const ids = hoja.getRange(desde, colId + 1, hoja.getLastRow() - desde + 1, 1).getValues();
+      if (ids.some(function (r) { return r[0] === datos.id_envio; })) return true;
+    }
+
     const fila = encabezados.map(function (col) { return limpiar_(datos[col]); });
     hoja.appendRow(fila);
   } finally {

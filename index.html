@@ -212,7 +212,8 @@ const PREGUNTAS = [
 /* ════════ ESTADO ════════ */
 // Dentro de Apps Script existe google.script; abierto directo en el navegador, no.
 const REAL = !!(window.google && google.script && google.script.run);
-const S = { curso: (REAL ? null : '7B'), paso:'intro', idx:0, r:{}, inicio:null, avisoDup:false, enviado:false };
+const S = { curso: (REAL ? null : '7B'), paso:'intro', idx:0, r:{}, inicio:null, avisoDup:false, enviado:false, enviando:false, idEnvio:'' };
+const nuevoIdEnvio = () => 'e-' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
 
 function store(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){ return null; } }
 function idDispositivo(){
@@ -246,6 +247,7 @@ function fila(){
   const dur = S.inicio ? Math.round((Date.now()-S.inicio)/1000) : '';
   f.push(['marca_tiempo', S.enviado ? new Date().toLocaleString('es-CL') : '(al enviar)', 'Fecha y hora del envío']);
   f.push(['curso', S.curso, nombreCurso(S.curso)+' · tomado del link']);
+  f.push(['id_envio', S.idEnvio, 'Identificador de este envío; el servidor descarta repetidos']);
   f.push(['id_dispositivo', DISP, 'Código al azar del navegador, no identifica al estudiante']);
   f.push(['aviso_duplicado', S.avisoDup ? 'SI' : 'NO', 'SI = ese dispositivo ya había enviado antes']);
   f.push(['duracion_seg', dur, 'Menos de ~60 s sugiere respuestas al azar']);
@@ -302,7 +304,7 @@ function renderIntro(sc){
     yaEnvio ? el('div',{class:'notice'}, el('strong',{},'En este dispositivo ya se envió una respuesta. '), 'Si estás usando el celular o computador de otra persona, puedes continuar sin problema.') : null,
     pickCurso,
     el('div',{class:'nav'}, el('span',{class:'req'}, 'Toma unos 5 minutos.'),
-      el('button',{class:'primary',type:'button',id:'btnStart',disabled:!S.curso,onclick:()=>{ S.avisoDup=yaEnvio; S.inicio=Date.now(); S.paso='q'; S.idx=0; render(); $('#screen h2')?.focus(); }}, 'Comenzar'))
+      el('button',{class:'primary',type:'button',id:'btnStart',disabled:!S.curso,onclick:()=>{ S.avisoDup=yaEnvio; S.inicio=Date.now(); S.idEnvio=nuevoIdEnvio(); S.paso='q'; S.idx=0; render(); $('#screen h2')?.focus(); }}, 'Comenzar'))
   );
 }
 
@@ -406,12 +408,14 @@ function avanzar(q){
 }
 
 function enviar(){
-  S.enviado = true;
+  if(S.enviando) return; // evita doble clic mientras se guarda
+  S.enviando = true; S.enviado = true;
+  const b0 = $('#btnNext'); if(b0){ b0.disabled = true; b0.textContent = 'Enviando…'; }
   const datos = Object.fromEntries(fila().map(([c,v])=>[c,v]));
-  const ok = ()=>{ store('encuesta_dia_enviado','1'); S.paso='fin'; render(); };
+  const ok = ()=>{ S.enviando=false; store('encuesta_dia_enviado','1'); S.paso='fin'; render(); };
   if(window.google && google.script && google.script.run){
     google.script.run.withSuccessHandler(ok)
-      .withFailureHandler(()=>{ S.enviado=false; const b=$('#btnNext'); if(b){ b.disabled=false; b.textContent='Reintentar envío'; } })
+      .withFailureHandler(()=>{ S.enviando=false; S.enviado=false; const b=$('#btnNext'); if(b){ b.disabled=false; b.textContent='Reintentar envío'; } })
       .guardarRespuesta(datos);
   } else ok(); // modo prueba: no se guarda en ninguna parte
 }
@@ -445,7 +449,7 @@ if(REAL){
 const sel = $('#cursoSim');
 CURSOS.forEach(c=>sel.append(el('option',{value:c.c,selected:c.c===S.curso}, `${c.n} (?curso=${c.c})`)));
 sel.addEventListener('change',e=>{ S.curso=e.target.value; render(); });
-$('#btnReset').addEventListener('click',()=>{ S.paso='intro'; S.idx=0; S.r={}; S.inicio=null; S.enviado=false; S.avisoDup=false; render(); });
+$('#btnReset').addEventListener('click',()=>{ S.paso='intro'; S.idx=0; S.r={}; S.inicio=null; S.enviado=false; S.enviando=false; S.idEnvio=''; S.avisoDup=false; render(); });
 $('#btnCopy').addEventListener('click',()=>{
   const txt = JSON.stringify(Object.fromEntries(fila().map(([c,v])=>[c,v])),null,2);
   const msg = $('#copyMsg');
