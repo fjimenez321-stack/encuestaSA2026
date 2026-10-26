@@ -22,7 +22,7 @@ Encuesta de seguimiento post-DIA del Colegio San Agustín (2026). Formulario pro
 
 ## Links por curso
 
-`…/exec?curso=6B`, `7B`, `8B`, `1M`, `2M`, `3M`, `4M`. Sin curso (o con uno inválido) el formulario le pregunta al estudiante.
+`…/exec?curso=4B`, `5B`, `6B`, `7B`, `8B`, `1M`, `2M`, `3M`, `4M`. Sin curso (o con uno inválido) el formulario le pregunta al estudiante.
 
 ## Configuración
 

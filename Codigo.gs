@@ -15,7 +15,7 @@
 // Déjalo vacío si el script está vinculado a la hoja. Si es un script suelto, pega aquí el ID de la hoja.
 const SHEET_ID = '';
 const HOJA_RESPUESTAS = 'Respuestas';
-const CURSOS_VALIDOS = ['6B', '7B', '8B', '1M', '2M', '3M', '4M'];
+const CURSOS_VALIDOS = ['4B', '5B', '6B', '7B', '8B', '1M', '2M', '3M', '4M'];
 
 function libro_() {
   return SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
