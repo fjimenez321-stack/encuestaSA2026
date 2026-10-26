@@ -1,0 +1,448 @@
+<title>Encuesta post-DIA</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: una columna angosta pensada para el celular del estudiante; una pregunta por pantalla, barra de prueba arriba y la fila de la hoja abajo. */
+:root{
+  --bg:#eef2f1; --surface:#ffffff; --ink:#17302b; --muted:#5b6f6a; --line:#cdd8d5;
+  --accent:#1f6f5c; --accent-ink:#ffffff; --soft:#dcebe6; --chalk:#b8860b; --chalk-soft:#fbf1d6; --warn:#9a5b00;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111a18; --surface:#18241f; --ink:#e3ece9; --muted:#93a8a2; --line:#2a3a35;
+  --accent:#5cc2a3; --accent-ink:#0d1a16; --soft:#1d3a31; --chalk:#e8b93e; --chalk-soft:#2e2814; --warn:#f0b35a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111a18; --surface:#18241f; --ink:#e3ece9; --muted:#93a8a2; --line:#2a3a35;
+  --accent:#5cc2a3; --accent-ink:#0d1a16; --soft:#1d3a31; --chalk:#e8b93e; --chalk-soft:#2e2814; --warn:#f0b35a; color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1.0625rem;line-height:1.5}
+*{box-sizing:border-box}
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:20px}
+
+/* barra de prueba */
+.testbar{border:1.5px dashed var(--chalk);background:var(--chalk-soft);border-radius:var(--r);padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;font-size:.9rem}
+.tag{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--chalk);font-weight:500}
+.testbar label{display:flex;gap:8px;align-items:center}
+.testbar select{font:inherit;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.testbar .hint{flex-basis:100%;color:var(--muted);font-size:.82rem}
+
+/* tarjeta principal */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px 20px;display:flex;flex-direction:column;gap:18px}
+.eyebrow{display:flex;justify-content:space-between;gap:12px;font-family:var(--f-mono);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.progress{height:6px;background:var(--soft);border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s ease}
+h1,h2{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.2}
+h1{font-size:1.9rem}
+h2{font-size:1.3rem;font-weight:600}
+.help{color:var(--muted);font-size:.95rem;margin:-8px 0 0}
+p{margin:0}
+.lead{color:var(--muted)}
+.notice{border-left:4px solid var(--chalk);background:var(--chalk-soft);padding:12px 14px;border-radius:0 10px 10px 0;font-size:.98rem}
+.notice strong{color:var(--ink)}
+.curso-pill{display:inline-block;font-family:var(--f-mono);font-size:.8rem;background:var(--soft);color:var(--accent);padding:3px 10px;border-radius:99px;font-weight:500}
+
+/* opciones */
+.opts{display:flex;flex-direction:column;gap:8px;border:0;margin:0;padding:0;min-width:0}
+.opt{position:relative;display:flex;align-items:center;gap:12px;padding:13px 14px;border:1.5px solid var(--line);border-radius:var(--r);cursor:pointer;background:var(--surface);transition:border-color .15s,background .15s}
+.opt:hover{border-color:var(--accent)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.mark{flex:none;width:22px;height:22px;border:2px solid var(--muted);border-radius:50%;display:grid;place-items:center}
+.opt.check .mark{border-radius:6px}
+.opt input:checked ~ .mark{border-color:var(--accent);background:var(--accent)}
+.opt input:checked ~ .mark::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent-ink)}
+.opt.check input:checked ~ .mark::after{width:10px;height:6px;border-radius:0;background:none;border-left:2.5px solid var(--accent-ink);border-bottom:2.5px solid var(--accent-ink);transform:rotate(-45deg) translate(1px,-1px)}
+.opt:has(input:checked){border-color:var(--accent);background:var(--soft)}
+.opt:has(input:focus-visible){outline:3px solid var(--chalk);outline-offset:2px}
+.opt:has(input:disabled){opacity:.45;cursor:not-allowed}
+.opt .txt{min-width:0}
+
+.row-block{display:flex;flex-direction:column;gap:8px}
+.row-block + .row-block{border-top:1px solid var(--line);padding-top:16px}
+.row-q{font-weight:700}
+.scale4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.scale4 .opt{flex-direction:column;justify-content:center;text-align:center;gap:6px;padding:10px 6px;font-size:.88rem;line-height:1.25}
+@media (max-width:460px){.scale4{grid-template-columns:repeat(2,1fr)}}
+
+textarea,.otra-input{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);padding:12px 14px}
+textarea{min-height:130px;resize:vertical}
+textarea:focus-visible,.otra-input:focus-visible,select:focus-visible{outline:3px solid var(--chalk);outline-offset:1px;border-color:var(--accent)}
+.count{font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+
+/* botones */
+.nav{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+button{font:inherit;cursor:pointer;border-radius:var(--r);padding:12px 20px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700}
+button:focus-visible{outline:3px solid var(--chalk);outline-offset:2px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.small{padding:6px 12px;font-size:.85rem}
+.req{font-size:.85rem;color:var(--muted)}
+
+/* panel de la hoja */
+details.sheet{background:var(--surface);border:1px solid var(--line);border-radius:16px}
+details.sheet summary{cursor:pointer;padding:14px 18px;display:flex;justify-content:space-between;gap:10px;align-items:center;list-style:none}
+details.sheet summary::-webkit-details-marker{display:none}
+details.sheet summary h3{margin:0;font-family:var(--f-display);font-size:1rem;font-weight:600}
+.sheet-body{padding:0 18px 18px;display:flex;flex-direction:column;gap:10px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-family:var(--f-mono);font-size:.78rem;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:500;background:var(--bg);position:sticky;top:0}
+td.empty{color:var(--muted)}
+tr:last-child td{border-bottom:0}
+.sheet-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toast{font-size:.85rem;color:var(--accent)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <div class="testbar" role="region" aria-label="Controles de prueba">
+    <span class="tag">Modo prueba</span>
+    <label for="cursoSim">Curso del link
+      <select id="cursoSim"></select>
+    </label>
+    <button class="small" id="btnReset" type="button">Empezar de nuevo</button>
+    <span class="hint">En la versión real el curso viene en el link (…/exec?curso=7B) y esta barra no aparece. Cambia el curso para ver cómo se adapta la encuesta.</span>
+  </div>
+
+  <main class="card" id="screen" aria-live="polite"></main>
+
+  <details class="sheet" id="sheet" open>
+    <summary><h3>Fila que se guardaría en la hoja</h3><span class="tag">vista previa</span></summary>
+    <div class="sheet-body">
+      <p class="req">Se actualiza mientras respondes. Las preguntas que no le corresponden al estudiante quedan vacías, no con una respuesta inventada.</p>
+      <div class="tbl"><table><thead><tr><th>Columna</th><th>Valor</th><th>Significado</th></tr></thead><tbody id="sheetRows"></tbody></table></div>
+      <div class="sheet-actions">
+        <button class="small" id="btnCopy" type="button">Copiar como JSON</button>
+        <span class="toast" id="copyMsg" role="status"></span>
+      </div>
+    </div>
+  </details>
+
+</div>
+
+<script>window.ES_APPS_SCRIPT=false;window.CURSO_DESDE_LINK=null;/*INYECCION*/</script>
+<script>
+/* ════════ CONFIGURACIÓN ════════
+   En Apps Script esto vendría de la pestaña "Config" de la hoja.
+   cursos: null = todos los cursos; o una lista de códigos.            */
+
+const CURSOS = [
+  {c:'6B', n:'6° Básico'}, {c:'7B', n:'7° Básico'}, {c:'8B', n:'8° Básico'},
+  {c:'1M', n:'1° Medio'},  {c:'2M', n:'2° Medio'},  {c:'3M', n:'3° Medio'}, {c:'4M', n:'4° Medio'}
+];
+const BASICA = ['6B','7B','8B'], MEDIA = ['1M','2M','3M','4M'], DIFERENCIADO = ['3M','4M'];
+
+// Cambia esta lista para limitar el taller de Matemática a ciertos cursos.
+const CURSOS_TALLER = null; // ej: ['7B','8B','1M']
+
+const ACUERDO = [{t:'Muy de acuerdo',v:4},{t:'De acuerdo',v:3},{t:'En desacuerdo',v:2},{t:'Muy en desacuerdo',v:1}];
+const CAMBIO_BIEN = (a,b)=>[{t:'Mucho '+a,v:5},{t:'Algo '+a,v:4},{t:'Igual',v:3},{t:'Algo '+b,v:2},{t:'Mucho '+b,v:1}];
+
+const PREGUNTAS = [
+  { id:'P1', sec:'Cómo te has sentido', tipo:'unica', col:'P1_estres_antes_clases',
+    texto:'Desde que respondiste el DIA, ¿cómo ha cambiado tu nivel de estrés antes de entrar a clases?',
+    opciones:[{t:'Ha bajado mucho',v:5},{t:'Ha bajado un poco',v:4},{t:'Sigue igual',v:3},{t:'Ha subido un poco',v:2},{t:'Ha subido mucho',v:1}] },
+  { id:'P2a', sec:'Cómo te has sentido', tipo:'unica', col:'P2a_manejo_estres',
+    texto:'Comparado con esa época, ¿cómo manejas hoy el estrés del colegio?',
+    opciones:CAMBIO_BIEN('mejor','peor') },
+  { id:'P2b', sec:'Cómo te has sentido', tipo:'unica', col:'P2b_facilidad_aprender',
+    texto:'Y aprender en el colegio, ¿te resulta más fácil o más difícil que en esa época?',
+    opciones:[{t:'Mucho más fácil',v:5},{t:'Algo más fácil',v:4},{t:'Igual',v:3},{t:'Algo más difícil',v:2},{t:'Mucho más difícil',v:1}] },
+  { id:'P3', sec:'Cómo te has sentido', tipo:'unica', col:'P3_evaluaciones',
+    texto:'Pensando en cómo los profesores organizan las evaluaciones (pruebas, trabajos, fechas y entregas), ¿crees que eso ha influido en tu aprendizaje?',
+    opciones:[{t:'Sí, me ha ayudado a aprender más',v:3},{t:'No ha influido',v:2},{t:'Sí, ha hecho que aprenda menos',v:1},{t:'No he notado cambios en las evaluaciones',v:0}] },
+
+  { id:'P4', sec:'Recreos', tipo:'unica', col:'P4_recreo_participa',
+    texto:'¿Has participado en las actividades organizadas durante los recreos?',
+    opciones:[{t:'Siempre o casi siempre',v:3},{t:'A veces',v:2},{t:'Nunca',v:1}] },
+  { id:'P5', sec:'Recreos', tipo:'unica', col:'P5_recreo_sensacion',
+    mostrar:r=>r.P4 && r.P4!==1,
+    texto:'Después de participar en esas actividades, ¿cómo te sientes?',
+    opciones:[{t:'Más tranquilo/a',v:3},{t:'Igual',v:2},{t:'Más inquieto/a',v:1}] },
+  { id:'P6', sec:'Recreos', tipo:'escala', mostrar:r=>r.P4 && r.P4!==1,
+    texto:'¿Qué tan de acuerdo estás con estas frases sobre las actividades del recreo?',
+    filas:[{col:'P6a_recreo_despejar',t:'Me ayudan a despejar la mente.'},
+           {col:'P6b_recreo_estres',t:'Me ayudan a sentir menos estrés.'},
+           {col:'P6c_recreo_concentracion',t:'Después me concentro mejor en clases.'}],
+    opciones:ACUERDO },
+  { id:'P7', sec:'Recreos', tipo:'unica', col:'P7_motivacion_sin_recreo',
+    mostrar:r=>r.P4===1,
+    texto:'Aunque no participes en las actividades del recreo, ¿cómo ha cambiado tu motivación para aprender este semestre?',
+    opciones:[{t:'Ha mejorado mucho',v:5},{t:'Ha mejorado un poco',v:4},{t:'Sigue igual',v:3},{t:'Ha empeorado un poco',v:2},{t:'Ha empeorado mucho',v:1}] },
+
+  { id:'P8', sec:'Taller de Matemática', tipo:'unica', col:'P8_taller_asistencia', cursos:CURSOS_TALLER,
+    texto:'¿Has participado de forma continua en los talleres de refuerzo de Matemática a cargo de la psicopedagoga Claudia Sepúlveda y la profesora Carol Navea?',
+    opciones:[{t:'Sí, voy a todas o casi todas las sesiones',v:4},{t:'Voy a veces',v:3},{t:'He ido muy pocas veces',v:2},{t:'No he participado',v:1},{t:'No sabía que existía este taller',v:0}] },
+  { id:'P9', sec:'Taller de Matemática', tipo:'abierta', col:'P9_taller_influencia', opcional:true, cursos:CURSOS_TALLER,
+    mostrar:r=>r.P8>=2,
+    texto:'¿De qué manera sientes que el taller ha influido en tu rendimiento en Matemática y en cómo manejas la ansiedad antes de las pruebas o clases?',
+    ayuda:'Cuéntalo con tus palabras. Puede ser algo que cambió o algo que sigue igual.' },
+  { id:'P10', sec:'Taller de Matemática', tipo:'escala', cursos:CURSOS_TALLER, mostrar:r=>r.P8>=2,
+    texto:'¿Qué tan de acuerdo estás con estas frases sobre el taller de Matemática?',
+    filas:[{col:'P10a_taller_academico',t:'Asistir al taller me ha ayudado a resolver mis dudas y aprender mejor la materia.'},
+           {col:'P10b_taller_emocional',t:'Gracias al taller me siento menos ansioso(a) o estresado(a) cuando me enfrento a la asignatura.'}],
+    opciones:ACUERDO },
+  { id:'P11', sec:'Taller de Matemática', tipo:'abierta', col:'P11_taller_mejoras', opcional:true, cursos:CURSOS_TALLER,
+    mostrar:r=>r.P8>=2,
+    texto:'Para seguir mejorando el taller, ¿qué deberíamos cambiar, agregar o hacer diferente para que aprendas mejor y sientas menos estrés?',
+    ayuda:'Por ejemplo: horario, duración, tipo de actividades, materiales o cantidad de estudiantes.' },
+
+  { id:'P12', sec:'Otras asignaturas', tipo:'multiple', col:'P12_otras_asignaturas', colOtra:'P12_otra_texto', max:3,
+    texto:'Si hubiera talleres de apoyo como este en otras asignaturas, ¿en cuáles te gustaría participar?',
+    ayuda:'Marca hasta 3.',
+    opciones:[
+      {t:'Lenguaje / Lengua y Literatura'},{t:'Inglés'},{t:'Historia, Geografía y Cs. Sociales'},
+      {t:'Ciencias Naturales', cursos:BASICA},
+      {t:'Biología', cursos:MEDIA},{t:'Física', cursos:MEDIA},{t:'Química', cursos:MEDIA},
+      {t:'Ciencias para la Ciudadanía', cursos:DIFERENCIADO},{t:'Filosofía', cursos:DIFERENCIADO},
+      {t:'Tecnología'},{t:'Artes Visuales'},{t:'Música'},{t:'Educación Física y Salud'},
+      {t:'Orientación (técnicas de estudio, organización, estrés)'},
+      {t:'Otra', otra:true},
+      {t:'Ninguna', exclusiva:true}
+    ] }
+];
+
+/* ════════ ESTADO ════════ */
+const REAL = window.ES_APPS_SCRIPT === true;
+const S = { curso: (window.CURSO_DESDE_LINK || (REAL ? null : '7B')), paso:'intro', idx:0, r:{}, inicio:null, avisoDup:false, enviado:false };
+
+function store(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){ return null; } }
+function idDispositivo(){
+  let id = store('encuesta_dia_dispositivo');
+  if(!id){ id = 'd-' + Math.random().toString(36).slice(2,8) + Date.now().toString(36).slice(-4); store('encuesta_dia_dispositivo', id); }
+  return id || 'sin-almacenamiento';
+}
+const DISP = idDispositivo();
+
+/* ════════ LÓGICA ════════ */
+const aplica = q => (!q.cursos || q.cursos.includes(S.curso)) && (!q.mostrar || q.mostrar(S.r));
+const visibles = () => PREGUNTAS.filter(aplica);
+const opcionesDe = q => q.opciones.filter(o => !o.cursos || o.cursos.includes(S.curso));
+const nombreCurso = c => (CURSOS.find(x=>x.c===c)||{}).n || c || '';
+
+function respondida(q){
+  const r = S.r;
+  if(q.tipo==='unica') return r[q.id]!==undefined;
+  if(q.tipo==='escala') return q.filas.every(f=>r[f.col]!==undefined);
+  if(q.tipo==='abierta') return q.opcional || (r[q.col]||'').trim().length>0;
+  if(q.tipo==='multiple'){
+    const sel = r[q.col]||[];
+    if(!sel.length) return false;
+    if(sel.includes('Otra') && !(r[q.colOtra]||'').trim()) return false;
+    return true;
+  }
+}
+
+function fila(){
+  const f = [];
+  const dur = S.inicio ? Math.round((Date.now()-S.inicio)/1000) : '';
+  f.push(['marca_tiempo', S.enviado ? new Date().toLocaleString('es-CL') : '(al enviar)', 'Fecha y hora del envío']);
+  f.push(['curso', S.curso, nombreCurso(S.curso)+' · tomado del link']);
+  f.push(['id_dispositivo', DISP, 'Código al azar del navegador, no identifica al estudiante']);
+  f.push(['aviso_duplicado', S.avisoDup ? 'SI' : 'NO', 'SI = ese dispositivo ya había enviado antes']);
+  f.push(['duracion_seg', dur, 'Menos de ~60 s sugiere respuestas al azar']);
+  for(const q of PREGUNTAS){
+    const ok = aplica(q);
+    if(q.tipo==='unica'){
+      const v = ok ? S.r[q.id] : undefined;
+      const o = q.opciones.find(o=>o.v===v);
+      f.push([q.col, v ?? '', ok ? (o ? o.t : '') : 'No aplica']);
+    } else if(q.tipo==='escala'){
+      for(const fl of q.filas){
+        const v = ok ? S.r[fl.col] : undefined;
+        const o = q.opciones.find(o=>o.v===v);
+        f.push([fl.col, v ?? '', ok ? (o ? o.t : '') : 'No aplica']);
+      }
+    } else if(q.tipo==='abierta'){
+      f.push([q.col, ok ? (S.r[q.col]||'') : '', ok ? 'Texto libre' : 'No aplica']);
+    } else if(q.tipo==='multiple'){
+      const sel = ok ? (S.r[q.col]||[]) : [];
+      f.push([q.col, sel.join('; '), sel.length ? sel.length+' seleccionada(s)' : '']);
+      f.push([q.colOtra, sel.includes('Otra') ? (S.r[q.colOtra]||'') : '', 'Solo si marcó "Otra"']);
+    }
+  }
+  return f;
+}
+
+/* ════════ RENDER ════════ */
+const $ = s => document.querySelector(s);
+const el = (tag, props={}, ...kids) => { const e=document.createElement(tag); for(const [k,v] of Object.entries(props)){ if(k==='class') e.className=v; else if(k.startsWith('on')) e.addEventListener(k.slice(2),v); else if(v!==false && v!=null) e.setAttribute(k,v===true?'':v); } for(const k of kids.flat()) if(k!=null) e.append(k.nodeType?k:document.createTextNode(k)); return e; };
+
+function render(){
+  const sc = $('#screen'); sc.replaceChildren();
+  if(S.paso==='intro') renderIntro(sc);
+  else if(S.paso==='q') renderPregunta(sc);
+  else renderFin(sc);
+  renderHoja();
+}
+
+function renderIntro(sc){
+  const yaEnvio = store('encuesta_dia_enviado')==='1';
+  // Si el link no trae curso, se le pregunta al estudiante.
+  let pickCurso = null;
+  if(!S.curso){
+    const s = el('select',{id:'cursoPick',class:'otra-input',onchange:e=>{ S.curso=e.target.value||null; $('#btnStart').disabled=!S.curso; }},
+      el('option',{value:''},'Elige tu curso…'), CURSOS.map(c=>el('option',{value:c.c},c.n)));
+    pickCurso = el('label',{for:'cursoPick',class:'row-block'}, el('span',{class:'row-q'},'¿En qué curso estás?'), s);
+  }
+  sc.append(
+    el('div',{class:'eyebrow'}, el('span',{},'Colegio San Agustín'), S.curso ? el('span',{class:'curso-pill'}, nombreCurso(S.curso)) : null),
+    el('h1',{},'¿Cómo te has sentido desde el DIA?'),
+    el('p',{class:'lead'},'Estas preguntas buscan conocer cómo te has sentido desde que respondiste el cuestionario socioemocional del DIA. No hay respuestas correctas ni incorrectas. Responde con sinceridad.'),
+    el('div',{class:'notice'}, el('strong',{},'La encuesta es anónima. '), 'No pedimos tu nombre ni tu correo. Por favor responde ', el('strong',{},'una sola vez'), '.'),
+    yaEnvio ? el('div',{class:'notice'}, el('strong',{},'En este dispositivo ya se envió una respuesta. '), 'Si estás usando el celular o computador de otra persona, puedes continuar sin problema.') : null,
+    pickCurso,
+    el('div',{class:'nav'}, el('span',{class:'req'}, 'Toma unos 5 minutos.'),
+      el('button',{class:'primary',type:'button',id:'btnStart',disabled:!S.curso,onclick:()=>{ S.avisoDup=yaEnvio; S.inicio=Date.now(); S.paso='q'; S.idx=0; render(); $('#screen h2')?.focus(); }}, 'Comenzar'))
+  );
+}
+
+function renderPregunta(sc){
+  const vis = visibles();
+  if(S.idx>=vis.length) S.idx=vis.length-1;
+  const q = vis[S.idx];
+  const pct = Math.round((S.idx)/(vis.length)*100);
+
+  sc.append(
+    el('div',{class:'eyebrow'}, el('span',{},q.sec), el('span',{}, `${S.idx+1} de ${vis.length}`)),
+    el('div',{class:'progress',role:'progressbar','aria-valuenow':pct,'aria-valuemin':0,'aria-valuemax':100}, el('span',{style:`width:${pct}%`})),
+    el('h2',{tabindex:'-1',id:'qtitle'}, q.texto),
+    q.ayuda ? el('p',{class:'help'}, q.ayuda) : null
+  );
+
+  if(q.tipo==='unica'){
+    const fs = el('fieldset',{class:'opts','aria-labelledby':'qtitle'});
+    opcionesDe(q).forEach((o,i)=>{
+      const id=`${q.id}_${i}`;
+      fs.append(el('label',{class:'opt',for:id},
+        el('input',{type:'radio',name:q.id,id,checked:S.r[q.id]===o.v,onchange:()=>{S.r[q.id]=o.v; refreshNav(); renderHoja();}}),
+        el('span',{class:'mark'}), el('span',{class:'txt'},o.t)));
+    });
+    sc.append(fs);
+  }
+
+  if(q.tipo==='escala'){
+    const box = el('div',{class:'opts'});
+    q.filas.forEach((f,fi)=>{
+      const g = el('fieldset',{class:'opts scale4','aria-label':f.t});
+      q.opciones.forEach((o,i)=>{
+        const id=`${f.col}_${i}`;
+        g.append(el('label',{class:'opt',for:id},
+          el('input',{type:'radio',name:f.col,id,checked:S.r[f.col]===o.v,onchange:()=>{S.r[f.col]=o.v; refreshNav(); renderHoja();}}),
+          el('span',{class:'mark'}), el('span',{class:'txt'},o.t)));
+      });
+      box.append(el('div',{class:'row-block'}, el('p',{class:'row-q'}, f.t), g));
+    });
+    sc.append(box);
+  }
+
+  if(q.tipo==='abierta'){
+    const cnt = el('span',{class:'count'});
+    const ta = el('textarea',{id:q.col,'aria-labelledby':'qtitle',maxlength:'800',placeholder:'Escribe aquí…',oninput:e=>{S.r[q.col]=e.target.value; cnt.textContent=`${e.target.value.length}/800`; refreshNav(); renderHoja();}});
+    ta.value = S.r[q.col]||''; cnt.textContent=`${ta.value.length}/800`;
+    sc.append(ta, el('div',{class:'nav'}, el('span',{class:'req'},'Opcional, pero nos ayuda mucho.'), cnt));
+  }
+
+  if(q.tipo==='multiple'){
+    const sel = S.r[q.col] || (S.r[q.col]=[]);
+    const fs = el('fieldset',{class:'opts','aria-labelledby':'qtitle'});
+    const otraInput = el('input',{class:'otra-input',type:'text',id:q.colOtra,placeholder:'¿Cuál?','aria-label':'Otra asignatura',maxlength:'80',
+      oninput:e=>{S.r[q.colOtra]=e.target.value; refreshNav(); renderHoja();}});
+    otraInput.value = S.r[q.colOtra]||'';
+    const sync = ()=>{
+      fs.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+        const t = cb.value, o = q.opciones.find(x=>x.t===t);
+        const lleno = sel.filter(s=>s!=='Ninguna').length>=q.max;
+        cb.disabled = !cb.checked && ( (sel.includes('Ninguna') && !o.exclusiva) || (lleno && !o.exclusiva) );
+      });
+      otraInput.hidden = !sel.includes('Otra');
+    };
+    opcionesDe(q).forEach((o,i)=>{
+      const id=`${q.id}_${i}`;
+      fs.append(el('label',{class:'opt check',for:id},
+        el('input',{type:'checkbox',id,value:o.t,checked:sel.includes(o.t),onchange:e=>{
+          if(e.target.checked){
+            if(o.exclusiva){ sel.length=0; fs.querySelectorAll('input[type=checkbox]').forEach(cb=>{ if(cb!==e.target) cb.checked=false; }); }
+            sel.push(o.t);
+          } else sel.splice(sel.indexOf(o.t),1);
+          sync(); refreshNav(); renderHoja();
+          if(o.otra && e.target.checked) otraInput.focus();
+        }}),
+        el('span',{class:'mark'}), el('span',{class:'txt'},o.t)));
+    });
+    sc.append(fs, otraInput); sync();
+  }
+
+  const esUltima = S.idx===vis.length-1;
+  sc.append(el('div',{class:'nav'},
+    el('button',{type:'button',onclick:()=>{ if(S.idx===0){S.paso='intro';} else S.idx--; render(); $('#qtitle')?.focus(); }},'Atrás'),
+    el('button',{class:'primary',type:'button',id:'btnNext',onclick:()=>avanzar(q)}, esUltima ? 'Enviar respuestas' : 'Siguiente')
+  ));
+  refreshNav();
+}
+
+function refreshNav(){
+  const vis = visibles(), q = vis[S.idx], b = $('#btnNext');
+  if(!b || !q) return;
+  b.disabled = !respondida(q);
+  b.textContent = S.idx===vis.length-1 ? 'Enviar respuestas' : 'Siguiente';
+}
+
+function avanzar(q){
+  // una respuesta puede cambiar qué viene después (ej. P4 o P8), así que se recalcula
+  const vis = visibles();
+  const pos = vis.findIndex(x=>x.id===q.id);
+  if(pos===vis.length-1) return enviar();
+  S.idx = pos+1; render(); $('#qtitle')?.focus();
+}
+
+function enviar(){
+  S.enviado = true;
+  const datos = Object.fromEntries(fila().map(([c,v])=>[c,v]));
+  const ok = ()=>{ store('encuesta_dia_enviado','1'); S.paso='fin'; render(); };
+  if(window.google && google.script && google.script.run){
+    google.script.run.withSuccessHandler(ok)
+      .withFailureHandler(()=>{ S.enviado=false; const b=$('#btnNext'); if(b){ b.disabled=false; b.textContent='Reintentar envío'; } })
+      .guardarRespuesta(datos);
+  } else ok(); // modo prueba: no se guarda en ninguna parte
+}
+
+function renderFin(sc){
+  sc.append(
+    el('div',{class:'eyebrow'}, el('span',{},'Listo'), el('span',{class:'curso-pill'}, nombreCurso(S.curso))),
+    el('h1',{tabindex:'-1'},'¡Gracias por responder!'),
+    el('p',{class:'lead'},'Tus respuestas nos ayudan a mejorar los recreos, los talleres y la forma en que organizamos las evaluaciones.'),
+    REAL ? null : el('div',{class:'notice'}, el('strong',{},'Modo prueba: '), 'no se envió nada. La fila de abajo es exactamente lo que llegaría a la hoja.')
+  );
+}
+
+function renderHoja(){
+  const tb = $('#sheetRows'); tb.replaceChildren();
+  for(const [c,v,s] of fila()){
+    const val = (v===''||v==null) ? '—' : String(v);
+    tb.append(el('tr',{}, el('td',{},c), el('td',{class:val==='—'?'empty':''}, val), el('td',{class:'empty'}, s)));
+  }
+}
+
+/* ════════ CONTROLES DE PRUEBA ════════ */
+if(REAL){ document.querySelector('.testbar').hidden = true; $('#sheet').hidden = true; }
+const sel = $('#cursoSim');
+CURSOS.forEach(c=>sel.append(el('option',{value:c.c,selected:c.c===S.curso}, `${c.n} (?curso=${c.c})`)));
+sel.addEventListener('change',e=>{ S.curso=e.target.value; render(); });
+$('#btnReset').addEventListener('click',()=>{ S.paso='intro'; S.idx=0; S.r={}; S.inicio=null; S.enviado=false; S.avisoDup=false; render(); });
+$('#btnCopy').addEventListener('click',()=>{
+  const txt = JSON.stringify(Object.fromEntries(fila().map(([c,v])=>[c,v])),null,2);
+  const msg = $('#copyMsg');
+  navigator.clipboard.writeText(txt).then(()=>{ msg.textContent='Copiado.'; },()=>{ msg.textContent='No se pudo copiar en este navegador.'; });
+  setTimeout(()=>msg.textContent='',2500);
+});
+
+render();
+</script>
