@@ -21,17 +21,9 @@ function libro_() {
   return SHEET_ID ? SpreadsheetApp.openById(SHEET_ID) : SpreadsheetApp.getActiveSpreadsheet();
 }
 
-/** Sirve la encuesta. El curso llega en el link: .../exec?curso=7B */
-function doGet(e) {
-  const pedido = String((e && e.parameter && e.parameter.curso) || '').toUpperCase();
-  const curso = CURSOS_VALIDOS.indexOf(pedido) >= 0 ? pedido : null; // curso inválido → se le pregunta
-
-  const html = HtmlService.createHtmlOutputFromFile('index').getContent().replace(
-    'window.ES_APPS_SCRIPT=false;window.CURSO_DESDE_LINK=null;/*INYECCION*/',
-    'window.ES_APPS_SCRIPT=true;window.CURSO_DESDE_LINK=' + JSON.stringify(curso) + ';'
-  );
-
-  return HtmlService.createHtmlOutput(html)
+/** Sirve la encuesta. El curso llega en el link (.../exec?curso=7B) y lo lee la propia página. */
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('Encuesta post-DIA · San Agustín')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);

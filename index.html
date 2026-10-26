@@ -127,7 +127,6 @@ tr:last-child td{border-bottom:0}
 
 </div>
 
-<script>window.ES_APPS_SCRIPT=false;window.CURSO_DESDE_LINK=null;/*INYECCION*/</script>
 <script>
 /* ════════ CONFIGURACIÓN ════════
    En Apps Script esto vendría de la pestaña "Config" de la hoja.
@@ -210,8 +209,9 @@ const PREGUNTAS = [
 ];
 
 /* ════════ ESTADO ════════ */
-const REAL = window.ES_APPS_SCRIPT === true;
-const S = { curso: (window.CURSO_DESDE_LINK || (REAL ? null : '7B')), paso:'intro', idx:0, r:{}, inicio:null, avisoDup:false, enviado:false };
+// Dentro de Apps Script existe google.script; abierto directo en el navegador, no.
+const REAL = !!(window.google && google.script && google.script.run);
+const S = { curso: (REAL ? null : '7B'), paso:'intro', idx:0, r:{}, inicio:null, avisoDup:false, enviado:false };
 
 function store(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v);}catch(e){ return null; } }
 function idDispositivo(){
@@ -273,7 +273,7 @@ function fila(){
 
 /* ════════ RENDER ════════ */
 const $ = s => document.querySelector(s);
-const el = (tag, props={}, ...kids) => { const e=document.createElement(tag); for(const [k,v] of Object.entries(props)){ if(k==='class') e.className=v; else if(k.startsWith('on')) e.addEventListener(k.slice(2),v); else if(v!==false && v!=null) e.setAttribute(k,v===true?'':v); } for(const k of kids.flat()) if(k!=null) e.append(k.nodeType?k:document.createTextNode(k)); return e; };
+const el = (tag, props={}, ...kids) => { const e=document.createElement(tag); for(const [k,v] of Object.entries(props)){ if(k==='class') e.className=v; else if(k.startsWith('on')) e.addEventListener(k.slice(2),v); else if(v!==false && v!=null) e.setAttribute(k,v===true?'':v); } kids.flat().filter(k => k !== null && k !== undefined && k !== false).forEach(k => e.append(k.nodeType ? k : document.createTextNode(String(k)))); return e; };
 
 function render(){
   const sc = $('#screen'); sc.replaceChildren();
@@ -432,7 +432,14 @@ function renderHoja(){
 }
 
 /* ════════ CONTROLES DE PRUEBA ════════ */
-if(REAL){ document.querySelector('.testbar').hidden = true; $('#sheet').hidden = true; }
+if(REAL){
+  document.querySelector('.testbar').hidden = true; $('#sheet').hidden = true;
+  // El curso viene en el link: .../exec?curso=7B (si falta o no es válido, se le pregunta al estudiante)
+  google.script.url.getLocation(loc => {
+    const c = String((loc.parameter && loc.parameter.curso) || '').toUpperCase();
+    if(CURSOS.some(x => x.c === c)){ S.curso = c; render(); }
+  });
+}
 const sel = $('#cursoSim');
 CURSOS.forEach(c=>sel.append(el('option',{value:c.c,selected:c.c===S.curso}, `${c.n} (?curso=${c.c})`)));
 sel.addEventListener('change',e=>{ S.curso=e.target.value; render(); });
