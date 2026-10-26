@@ -20,6 +20,7 @@
   --bg:#111a18; --surface:#18241f; --ink:#e3ece9; --muted:#93a8a2; --line:#2a3a35;
   --accent:#5cc2a3; --accent-ink:#0d1a16; --soft:#1d3a31; --chalk:#e8b93e; --chalk-soft:#2e2814; --warn:#f0b35a; color-scheme:dark}
 
+[hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1.0625rem;line-height:1.5}
 *{box-sizing:border-box}
 .wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px;display:flex;flex-direction:column;gap:20px}
@@ -273,6 +274,7 @@ function fila(){
 
 /* ════════ RENDER ════════ */
 const $ = s => document.querySelector(s);
+const put = (parent, ...kids) => parent.append(...kids.flat().filter(k => k !== null && k !== undefined && k !== false));
 const el = (tag, props={}, ...kids) => { const e=document.createElement(tag); for(const [k,v] of Object.entries(props)){ if(k==='class') e.className=v; else if(k.startsWith('on')) e.addEventListener(k.slice(2),v); else if(v!==false && v!=null) e.setAttribute(k,v===true?'':v); } kids.flat().filter(k => k !== null && k !== undefined && k !== false).forEach(k => e.append(k.nodeType ? k : document.createTextNode(String(k)))); return e; };
 
 function render(){
@@ -292,7 +294,7 @@ function renderIntro(sc){
       el('option',{value:''},'Elige tu curso…'), CURSOS.map(c=>el('option',{value:c.c},c.n)));
     pickCurso = el('label',{for:'cursoPick',class:'row-block'}, el('span',{class:'row-q'},'¿En qué curso estás?'), s);
   }
-  sc.append(
+  put(sc, 
     el('div',{class:'eyebrow'}, el('span',{},'Colegio San Agustín'), S.curso ? el('span',{class:'curso-pill'}, nombreCurso(S.curso)) : null),
     el('h1',{},'¿Cómo te has sentido desde el DIA?'),
     el('p',{class:'lead'},'Estas preguntas buscan conocer cómo te has sentido desde que respondiste el cuestionario socioemocional del DIA. No hay respuestas correctas ni incorrectas. Responde con sinceridad.'),
@@ -310,7 +312,7 @@ function renderPregunta(sc){
   const q = vis[S.idx];
   const pct = Math.round((S.idx)/(vis.length)*100);
 
-  sc.append(
+  put(sc, 
     el('div',{class:'eyebrow'}, el('span',{},q.sec), el('span',{}, `${S.idx+1} de ${vis.length}`)),
     el('div',{class:'progress',role:'progressbar','aria-valuenow':pct,'aria-valuemin':0,'aria-valuemax':100}, el('span',{style:`width:${pct}%`})),
     el('h2',{tabindex:'-1',id:'qtitle'}, q.texto),
@@ -325,7 +327,7 @@ function renderPregunta(sc){
         el('input',{type:'radio',name:q.id,id,checked:S.r[q.id]===o.v,onchange:()=>{S.r[q.id]=o.v; refreshNav(); renderHoja();}}),
         el('span',{class:'mark'}), el('span',{class:'txt'},o.t)));
     });
-    sc.append(fs);
+    put(sc, fs);
   }
 
   if(q.tipo==='escala'){
@@ -340,14 +342,14 @@ function renderPregunta(sc){
       });
       box.append(el('div',{class:'row-block'}, el('p',{class:'row-q'}, f.t), g));
     });
-    sc.append(box);
+    put(sc, box);
   }
 
   if(q.tipo==='abierta'){
     const cnt = el('span',{class:'count'});
     const ta = el('textarea',{id:q.col,'aria-labelledby':'qtitle',maxlength:'800',placeholder:'Escribe aquí…',oninput:e=>{S.r[q.col]=e.target.value; cnt.textContent=`${e.target.value.length}/800`; refreshNav(); renderHoja();}});
     ta.value = S.r[q.col]||''; cnt.textContent=`${ta.value.length}/800`;
-    sc.append(ta, el('div',{class:'nav'}, el('span',{class:'req'},'Opcional, pero nos ayuda mucho.'), cnt));
+    put(sc, ta, el('div',{class:'nav'}, el('span',{class:'req'},'Opcional, pero nos ayuda mucho.'), cnt));
   }
 
   if(q.tipo==='multiple'){
@@ -377,11 +379,11 @@ function renderPregunta(sc){
         }}),
         el('span',{class:'mark'}), el('span',{class:'txt'},o.t)));
     });
-    sc.append(fs, otraInput); sync();
+    put(sc, fs, otraInput); sync();
   }
 
   const esUltima = S.idx===vis.length-1;
-  sc.append(el('div',{class:'nav'},
+  put(sc, el('div',{class:'nav'},
     el('button',{type:'button',onclick:()=>{ if(S.idx===0){S.paso='intro';} else S.idx--; render(); $('#qtitle')?.focus(); }},'Atrás'),
     el('button',{class:'primary',type:'button',id:'btnNext',onclick:()=>avanzar(q)}, esUltima ? 'Enviar respuestas' : 'Siguiente')
   ));
@@ -415,7 +417,7 @@ function enviar(){
 }
 
 function renderFin(sc){
-  sc.append(
+  put(sc, 
     el('div',{class:'eyebrow'}, el('span',{},'Listo'), el('span',{class:'curso-pill'}, nombreCurso(S.curso))),
     el('h1',{tabindex:'-1'},'¡Gracias por responder!'),
     el('p',{class:'lead'},'Tus respuestas nos ayudan a mejorar los recreos, los talleres y la forma en que organizamos las evaluaciones.'),
