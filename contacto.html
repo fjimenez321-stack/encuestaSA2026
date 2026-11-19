@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contacto | Colegio San Agustín</title>
+  <link rel="icon" href="img/logo.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <div data-cabecera="Contacto"></div>
+
+  <main class="contenido"><div class="contenedor">
+<!-- ===== CONTENIDO DE LA PÁGINA (edita desde aquí) ===== -->
+    <div class="dos-col" style="align-items:start">
+      <div class="caja">
+        <h2>Escríbenos</h2>
+        <!-- El formulario abre el correo del visitante. Para recibirlo en una planilla,
+             reemplaza action por la URL de un Google Form o Apps Script. -->
+        <form class="form" id="form-contacto">
+          <label for="nombre">Nombre</label><input id="nombre" required>
+          <label for="correo">Correo</label><input id="correo" type="email" required>
+          <label for="asunto">Asunto</label>
+          <select id="asunto"><option>Consulta general</option><option>Admisión</option><option>Secretaría</option><option>Convivencia escolar</option></select>
+          <label for="mensaje">Mensaje</label><textarea id="mensaje" rows="5" required></textarea>
+          <button class="btn btn-primario" type="submit">Enviar mensaje</button>
+        </form>
+      </div>
+      <div>
+        <div class="caja" data-contacto></div>
+        <iframe class="mapa" data-mapa title="Mapa del colegio" loading="lazy" style="margin-top:1.5rem"></iframe>
+      </div>
+    </div>
+    <script>
+      document.getElementById("form-contacto").onsubmit = (e) => {
+        e.preventDefault();
+        const v = (id) => encodeURIComponent(document.getElementById(id).value);
+        location.href = `mailto:${window.SITIO.correo}?subject=${v("asunto")}%20-%20${v("nombre")}&body=${v("mensaje")}%0A%0A${v("correo")}`;
+      };
+    </script>
+<!-- ===== FIN DEL CONTENIDO ===== -->
+  </div></main>
+
+  <script src="js/config.js"></script>
+  <script src="data/contenido.js"></script>
+  <script src="js/layout.js"></script>
+</body>
+</html>
